@@ -3,7 +3,7 @@
 This the open source code used for the paper *Lalauze-Pol R, Jouen F. Facial Growth in Children from 1 Month to 7 Years: A Biometric Approach by Image Processing. GSL J Pediatr. 2020; 1:105*.
 
 
-#Required
+# Required
 First of all you need to install Red Language. Download a recent or the latest version (Automated builds, master branch). See
 [Red Programming Language](http://www.red-lang.org).
 
@@ -11,11 +11,11 @@ Face also uses [redCV library](https://github.com/ldci/redCV) which is included 
 
 Face software requires [DLib c++ library](http://dlib.net) for facial landmarks recognition and  Python 3. For using dlib from Python just do `pip3 install dlib` in your terminal.
 
-#Compilation
+# Compilation
 Very easy: just `red -c face.red`
 
 
-#Using Face
+# Using Face
 Face processes 2-D images of faces for measuring facial heights, ratios and surfaces. You'll find in /publication  directory, our paper which gives all details about the used method.
 
 
