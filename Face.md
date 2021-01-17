@@ -18,5 +18,8 @@ Very easy: just `red -c face.red`
 # Using Face
 Face processes 2-D images of faces for measuring facial heights, ratios and surfaces. You'll find in /publication  directory, our paper which gives all details about the used method.
 
+## Basic Use
+
+Load a source image e.g. /images/face1.png, and modify angle if necessary. In all cases save modified image. This creates a copy of the source image, e.g. /images/face1C.png. Then load the source image as a *processed image*. Do not use the copy image file name, but **the source image file name**. The mapping betwen both images is automatic. Now you can find landmarks and compute values.
 
 
