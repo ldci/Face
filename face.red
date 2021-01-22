@@ -8,7 +8,6 @@ Red [
 home: select list-env "HOME"
 appDir: rejoin [home "/Programmation/Red/Face"]
 change-dir to-file appDir
-
 landmarksFile: 	%config/landmarks.jpg
 glossFile: 		%config/glossaire.txt
 configFile: 	%config/config.txt 
@@ -20,8 +19,9 @@ resultFile: 	%detectedPoints.txt
 #include %redCV/libs/matrix/rcvMatrix.red
 #include %redCV/libs/imgproc/rcvImgProc.red
 #include %redCV/libs/imgproc/rcvColorSpace.red
-;--Dlib python
-prog: "python3 FacePoints.py '"
+
+;--Dlib python script: python3 required!
+prog: rejoin ["python3 " appDir "/FacePoints.py '"]
 
 margins: 10x10
 gsize:	450x500
@@ -31,8 +31,8 @@ rot: 		0.0
 sFactor: 	1.0
 transl: 	0x0
 nbPMax: 73
-isFile: isProcessed: isCorrectedImage: isNumbered: isSource: false
-isThermic: isQuit: true
+isFile?: isCorrectedImage?: isNumbered?: isSource?: false
+isThermic?: isQuit?: true
 colorSpace: 1
 canvas: canvas1: canvas2: canvas3: none
 img:	make image! 10x10
@@ -48,89 +48,89 @@ imageName: imageCName: pointsFile: fileResult: thermCName: file!
 glossaire: 		copy []
 count: 			0
 separator: 		tab
-cfactor: 		14x0 		; pour le marqueur
-listNPoint: 	copy []		; numero
-listLPoints:	copy []		; label	
+cfactor: 		14x0 		;--for landmark
+listNPoint: 	copy []		;--number
+listLPoints:	copy []		;--label	
 listeMP: 		copy []
 drawBlock: 		copy []
 convex:			copy []
 
 ; variables pour les calculs
-sLowFaceR:		0.0		;surface Lower Area droit
-sLowFaceL:		0.0		;surface Lower Area gauche
-sMiddleFaceR:	0.0		;surface etage moyen droit
-sMiddleFaceL:	0.0		;surface etage moyen gauche
-sSubNasalR:		0.0		;surface Right Sub Nasal 
-sSubNasalL:		0.0		;surface Left Sub Nasal 
-sOrbitalR:		0.0		;surface orbital droit
-sOrbitalL:		0.0		;surface orbital gauche
-sChinR:			0.0		;surface mentonnière droite
-sChinL:			0.0		;surface mentonnière gauche
-sMandR: 		0.0		;surface mandidulo-jugale droite
-sMandL: 		0.0		;surface mandidulo-jugale left
-sFacialTotal:	0.0		;Facial Surface  totale
-sFacialMiddle:	0.0		;surface etage moyen
+sLowFaceR:		0.0		;surface Lower Area right
+sLowFaceL:		0.0		;surface Lower Area left
+sMiddleFaceR:	0.0		;surface Median Area right
+sMiddleFaceL:	0.0		;surface Median Area left
+sSubNasalR:		0.0		;surface Sub Nasal right
+sSubNasalL:		0.0		;surface Sub Nasal left 
+sOrbitalR:		0.0		;surface Orbital right
+sOrbitalL:		0.0		;surface Orbital left
+sChinR:			0.0		;surface Chin right
+sChinL:			0.0		;surface Chin left
+sMandR: 		0.0		;surface Mandidulo-jugal right
+sMandL: 		0.0		;surface Mandidulo-jugal left
+sFacialTotal:	0.0		;surface Total Facial 
+sFacialMiddle:	0.0		;surface Median Area
 sFacialLow:		0.0		;surface Lower Area
-sRightHemiface:	0.0		;surface hémiface droit
-sLeftHemiface:	0.0		;surface hémiface hauche
-hFacialSup:		0.0		;hauteur facial supérieur
-hFacialMiddle:	0.0		;hauteur etage moyen
-hFacialInf:		0.0		;hauteur Lower Area
-hFacialTotal:	0.0		;hauteur facial totale
+sRightHemiface:	0.0		;surface Hemiface right 
+sLeftHemiface:	0.0		;surface Hemiface left
+hFacialSup:		0.0		;height Lower Facial Area
+hFacialMiddle:	0.0		;height Median Facial Area
+hFacialInf:		0.0		;height Lower FacialArea
+hFacialTotal:	0.0		;height Total Facial Area
 
-rVertical1:		0.0		; ratio hauteur
-rVertical2:		0.0		; ratio hauteur
-rVertical3:		0.0		; ratio hauteur
+rVertical1:		0.0		;height ratio 
+rVertical2:		0.0		;height ratio 
+rVertical3:		0.0		;height ratio 
 
-rOrbital1:		0.0		; ratio développement orbital
-rOrbital2:		0.0		; ratio développement orbital
-rOrbital3:		0.0		; ratio développement orbital
-rOrbital4:		0.0		; ratio développement orbital
-rOrbital5:		0.0		; ratio développement orbital
+rOrbital1:		0.0		;Orbital Development ratio  
+rOrbital2:		0.0		;Orbital Development ratio  
+rOrbital3:		0.0		;Orbital Development ratio  
+rOrbital4:		0.0		;Orbital Development ratio  
+rOrbital5:		0.0		;Orbital Development ratio  
 
-rHemiFace1:		0.0		; ratio hémiface
-rHemiFace2:		0.0		; ratio hémiface
-rHemiFace3:		0.0		; ratio hémiface
+rHemiFace1:		0.0		;Hemiface ratio 
+rHemiFace2:		0.0		;Hemiface ratio 
+rHemiFace3:		0.0		;Hemiface ratio 
 
-rMiddleFace1:	0.0		; ratio étage moyen
-rMiddleFace2:	0.0		; ratio étage moyen
-rMiddleFace3:	0.0		; ratio étage moyen
-rMiddleFace4:	0.0		; ratio étage moyen
-rMiddleFace5:	0.0		; ratio étage moyen
-rMiddleFace6:	0.0		; ratio étage moyen
+rMiddleFace1:	0.0		;Median Area ratio
+rMiddleFace2:	0.0		;Median Area ratio
+rMiddleFace3:	0.0		;Median Area ratio
+rMiddleFace4:	0.0		;Median Area ratio
+rMiddleFace5:	0.0		;Median Area ratio
+rMiddleFace6:	0.0		;Median Area ratio
 
-rLowFace1:		0.0		; ratio étage moyen
-rLowFace2:		0.0		; ratio étage moyen
-rLowFace3:		0.0		; ratio étage moyen
-rLowFace4:		0.0		; ratio étage moyen
-rLowFace5:		0.0		; ratio étage moyen
-rLowFace6:		0.0		; ratio étage moyen
+rLowFace1:		0.0		;Lower Area ratio
+rLowFace2:		0.0		;Lower Area ratio
+rLowFace3:		0.0		;Lower Area ratio
+rLowFace4:		0.0		;Lower Area ratio
+rLowFace5:		0.0		;Lower Area ratio
+rLowFace6:		0.0		;Lower Area ratio
 
-rChin1:			0.0		; ratio menton
-rChin2:			0.0		; ratio menton
-rChin3:			0.0		; ratio menton
-rChin4:			0.0		; ratio menton
-rChin5:			0.0		; ratio menton
+rChin1:			0.0		;Chin ratio
+rChin2:			0.0		;Chin ratio
+rChin3:			0.0		;Chin ratio
+rChin4:			0.0		;Chin ratio
+rChin5:			0.0		;Chin ratio
 
-rMand1:			0.0		; ratio menton
-rMand2:			0.0		; ratio menton
-rMand3:			0.0		; ratio menton
-rMand4:			0.0		; ratio menton
-rMand5:			0.0		; ratio menton
+rMand1:			0.0		;Mandidular ratio
+rMand2:			0.0		;Mandidular ratio
+rMand3:			0.0		;Mandidular ratio
+rMand4:			0.0		;Mandidular ratio
+rMand5:			0.0		;Mandidular ratio
 
-rNasal1:		0.0		; ratio sub-nasal
-rNasal2:		0.0		; ratio sub-nasal
-rNasal3:		0.0		; ratio sub-nasal
-rNasal4:		0.0		; ratio sub-nasal
-rNasal5:		0.0		; ratio sub-nasal
+rNasal1:		0.0		;Sub-Nasal ratio
+rNasal2:		0.0		;Sub-Nasal ratio
+rNasal3:		0.0		;Sub-Nasal ratio
+rNasal4:		0.0		;Sub-Nasal ratio
+rNasal5:		0.0		;Sub-Nasal ratio
 
-aRightEye:		0.0		; angle 
-aLeftEye:		0.0		; angle 
-aBichelion: 	0.0		; angle 
-aBicanthal: 	0.0		; angle 
+aRightEye:		0.0		;angle 
+aLeftEye:		0.0		;angle 
+aBichelion: 	0.0		;angle 
+aBicanthal: 	0.0		;angle 
 
 measures: [
-	"All points" 
+	"All Landmarks" 
 	"---------Heights---------"
 	"Upper Vertical Axis" 
 	"Median Vertical Axis"  
@@ -158,8 +158,8 @@ p1: p2: p3: p4: p5: p6: p7: p8: p9: p10: 0x0
 ;--Landmarks draw 
 dBlock: 	[pen blue fill-pen pink triangle 7x7 14x0 21x7]		; defaut
 dMblock:	[pen blue fill-pen yellow triangle 7x7 14x0 21x7] 	; median
-dRBlock:	[pen blue fill-pen green triangle 7x7 14x0 21x7]	; droite
-dLBlock:	[pen blue fill-pen red triangle 7x7 14x0 21x7]		; gauche
+dRBlock:	[pen blue fill-pen green triangle 7x7 14x0 21x7]	; right
+dLBlock:	[pen blue fill-pen red triangle 7x7 14x0 21x7]		; left
 
 smallFont: make font! [
 			name: "Arial" 
@@ -198,7 +198,7 @@ readConfig: does [
 saveConfig: does [
 	write configFile rejoin ["Vertex" newline]
 	i: 0 
-	; quels sont les marqueurs sélectionnés ?
+	; which selected vertices?
 	while [i < nbPMax] [
 		m: to-word rejoin ["m" i]
 		if select get m 'data [; ' 
@@ -266,23 +266,24 @@ setAllMarks: function [nbPMax [integer!] flag [logic!]] [
 getMarks: does [
 	coordList/data: copy []
 	result: read/lines resultFile 
-	; quels vertex sont sélectionnés
+	;--which selected vertices?
 	i: 0
 	while [i <= (nbPMax - 6)] [
 		m: to-word rejoin ["m" i]
 		mp: listeMP/(i + 1)
-		b: to-block result/(i + 1)
-		p: as-pair second b third b	; les coordonnées calculées par le réseau
+		str: split result/(i + 1) " "
+		;--landmarks coordinates
+		p: as-pair to-integer second str to-integer third str
 		append coordList/data rejoin [mp/extra " : " form p]
 		p: p + canvas2/offset - cfactor; modification pour affichage dans le canvas
 		mp/offset: p 
 		if select get m 'data [;'	
 			mp/visible?: true
-			either isNumbered [mp/text: form i] [mp/text: none]
+			either isNumbered? [mp/text: form i] [mp/text: none]
 		]
 		i: i + 1
 	]
-	; supplementary landmarks
+	;--supplementary landmarks
 	while [i < nbPMax] [
 		m: to-word rejoin ["m" i]
 		mp: listeMP/(i + 1)
@@ -296,7 +297,7 @@ getMarks: does [
 		append coordList/data rejoin [mp/extra " : " form p]
 		if select get m 'data [;'
 			mp/visible?: true
-			either isNumbered [mp/text: form i] [mp/text: none]
+			either isNumbered? [mp/text: form i] [mp/text: none]
 			p: p + canvas2/offset - cfactor; modification pour affichage dans le canvas
 			mp/offset: p
 		]
@@ -308,19 +309,20 @@ getMarks: does [
 getMarks2: does [
 	coordList/data: copy []
 	result: read/lines pointsFile
-	; quels vertex sont sélectionnés
+	;--which selected vertices?
 	i: 0
 	while [i < nbPMax] [
 		m: to-word rejoin ["m" i]
 		mp: listeMP/(i + 1)
-		b: to-block result/(i + 1)
-		p: as-pair second b third b	; les coordonnées calculées par le réseau
+		str: split result/(i + 1) " "
+		; les coordonnées calculées par le réseau
+		p: as-pair to-integer second str to-integer third str
 		append coordList/data rejoin [mp/extra " : " form p]
 		p: p + canvas2/offset - cfactor; modification pour affichage dans le canvas
 		mp/offset: p 
 		if select get m 'data [;'	
 			mp/visible?: true
-			either isNumbered [mp/text: form i] [mp/text: none]
+			either isNumbered? [mp/text: form i] [mp/text: none]
 			if any [i = 66 i = 69 i = 71 i = 28 i = 33 i = 51 i = 8] [mp/draw: dMblock]
 			if any [i = 0 i = 2 i = 4 i = 6 i = 17 i = 19 i = 21 
 					i = 36 i = 39 i = 40 i = 41 i = 31 i = 48 i = 68] [mp/draw: dRblock]
@@ -351,8 +353,8 @@ showMarks: function [flag [logic!]] [
 
 ;--save landmarks changes
 saveMarks: does [
-	if isFile [ 
-		either isProcessed [
+	if isFile? [ 
+		either isCorrectedImage? [
 			write pointsFile "";rejoin ["Points" newline]
 			i: 0
 			while [i < (nbPMax)] [
@@ -363,17 +365,18 @@ saveMarks: does [
 			i: i + 1
 			]
 			sb1/text: "Landmarks are saved"
-		] [Alert "Detect landmarks" isProcessed: false]
+		] [Alert "Detect landmarks first" isCorrectedImage?: false]
 	]
 ]
 
 ;--images
-;--flag 0: source image flag 1: processed image 
+;--flag 0: source image 
+;--flag 1: processed image 
 
 loadImage: func [flag [integer!]] [
 	tmp: request-file
 	if not none? tmp [
-		gsize: 		450x500 
+		gsize: 450x500 
 		coordList/data: copy []
 		calcul/text: copy ""
 		clear sb2/text
@@ -382,19 +385,21 @@ loadImage: func [flag [integer!]] [
 		showMarks false
 		rotation: copy []
 		canvas1/image: canvas1/draw: canvas2/image: canvas2/draw: none
-		mainWin/text: to-string tmp
+		mainWin/text: rejoin ["CHArt/R2P2: Face [" to-string tmp "]"]
 		filePath: first split-path tmp
-		fileName:  second split-path tmp
-		n: length? fileName
-		nn: n - 4
-		imageName: to-string copy/part fileName nn
-		ext: skip fileName nn
+		fileName: second split-path tmp
+		imageName: to-string fileName	;--file without or with extension
+		if not none? suffix? fileName [
+			n: length? fileName
+			nn: n - 4
+			imageName: to-string copy/part fileName nn
+		]
+		;--create required files
 		imageCName: to-file rejoin [filePath imageName "C.png"]
 		pointsFile: to-file rejoin [filePath imageName "P.txt"]
 		fileResult: to-file rejoin [filePath imageName "R.txt"]
 		thermCName: to-file rejoin [filePath imageName "Therm.png"]
-		prog: copy "python3 FacePoints.py '"
-		append append prog to-string imageCName "'"
+		prog: rejoin ["python3 " appDir "/FacePoints.py '" to-string imageCName "'" ]
 		img0: load tmp
 		hsv: rcvCloneImage img0
 		
@@ -407,7 +412,6 @@ loadImage: func [flag [integer!]] [
 			ratio: to-float img0/size/y / to-float img0/size/x
 			gSize/y: to-integer gSize/x * ratio
 		]
-		
 		img1: rcvResizeImage hsv gSize / 2 
 		transl: (canvas1/size - img1/size) / 2
 		bl: compose [translate (transl)image img1]
@@ -433,27 +437,27 @@ loadImage: func [flag [integer!]] [
 		]
 		count: flag
 		if flag = 0 [
-			sl/visible?: rotF/visible?: isSource: true
+			sl/visible?: rotF/visible?: isSource?: true
 			bm/visible?: bp/visible?: true
-			isProcessed: isCorrectedImage: false
+			isCorrectedImage?: isCorrectedImage: false
 			sb1/text: copy "Loaded file: source  image "
 			append append append sb1/text "[" form img0/size " pixels]"
 			append append append sb1/text "[" form img2/size " pixels]"
 		]
 		if flag = 1 [
 			getMarks2 
-			sl/visible?: rotF/visible?: isSource: false
+			sl/visible?: rotF/visible?: isSource?: false
 			bm/visible?: bp/visible?: false
-			isProcessed: isCorrectedImage: true
+			isCorrectedImage?: isCorrectedImage: true
 			sb1/text: copy "Loaded file: processed image "
 			append append append sb1/text "[" form img2/size " pixels]"
 		]
-		isFile: true
+		isFile?: true
 	]
 ]
 
 saveCorrectedImage: does [
-	either isFile [
+	either isFile? [
 		img: to-image canvas2
 		save/as imageCName img 'png ;'
 		sb1/text: copy "Image  "
@@ -465,32 +469,32 @@ saveCorrectedImage: does [
 ]
 
 processCorrectedImage: does [
-	if isFile [
+	if isFile? [
 		either isCorrectedImage [
 			sb1/text: "Patience! Landmarks identification" 
 			do-events/no-wait
-			isProcessed: false
-				if isSource [
+			isCorrectedImage?: false
+				if isSource? [
 					;--source image: calculate and save 73 landmarks
 					t1: now/time/precise
 					if count = 0 [call/wait prog getMarks] 
 					t2: now/time/precise
 					elapsed: round/to (third t2 - third t1) 0.01
-					isProcessed: true
+					isCorrectedImage?: true
 					saveMarks
 					sb1/text: rejoin ["Landmarks identified and saved in " form elapsed " sec"]
 				] 
 			getMarks2
 			count: count + 1
-			isProcessed: true
+			isCorrectedImage?: true
 			img2: load imageCName
 			canvas2/draw: none
 			canvas2/image: none
 			canvas2/image: img2
-			sl/visible?: rotF/visible?: isSource: false
+			sl/visible?: rotF/visible?: isSource?: false
 			bm/visible?: bp/visible?: false
 		]
-		[Alert "Save Modified Image"]
+		[Alert "Save Image First"]
 	]
 ]
 
@@ -542,7 +546,7 @@ getAllPoints: does [
 ]
 
 ;-------------------- Angles ------------------------
-; calcul les angles des yeux
+;--eyes angulation
 getEyesAngles: func [return: [block!]] [
 	n: length? glossaire
 	i: 1
@@ -1282,7 +1286,7 @@ showLowFaceR: does [
 	rLowFace3:	round/to sLowFaceR / sFacialLow 0.001
 	rLowFace4:	round/to sLowFaceL / sFacialTotal 0.001
 	rLowFace5:	round/to sLowFaceL / sFacialLow 0.001
-	rLowFace6:	round/to sLowFaceR / sFacialLow 0.001
+	rLowFace6:	round/to sLowFaceR / sLowFaceL 0.001
 	showRatio "Lower Area: " "Facial Surface: " sFacialLow sFacialTotal rLowFace1
 	showRatio "Right Lower Area: " "Facial Surface: " sLowFaceR sFacialTotal rLowFace2
 	showRatio "Right Lower Area: " "Lower Area: " sLowFaceR sFacialLow rLowFace3	
@@ -1405,7 +1409,7 @@ exportResults: does [
 	write/append fileResult rejoin [rLowFace4 separator]
 	write/append fileResult rejoin [rLowFace5 separator]
 	write/append fileResult rejoin [rLowFace6 separator]
-	;surfaces Etage moyen
+	;surfaces Median Area
 	write/append fileResult rejoin [rMiddleFace1 separator]
 	write/append fileResult rejoin [rMiddleFace2 separator]
 	write/append fileResult rejoin [rMiddleFace3 separator]
@@ -1440,7 +1444,8 @@ markWin: layout [
 	origin margins space margins
 	button "All Landmarks"		[setAllMarks nbPMax true]
 	button "Clear Landmarks"	[setAllMarks nbPMax false]
-	button "Save Landmarks"		[saveConfig]	
+	button "Save Landmarks"		[saveConfig]
+	pad 280x0 	
 	button "Close Window" 		[unview/only markWin]
 	return
 	space 10x5
@@ -1475,7 +1480,7 @@ markWin: layout [
 
 quitRequested: does [
 	view/flags confirmWin ['modal 'no-buttons]
-	if isQuit [
+	if isQuit? [
 		if exists? %hsv.png [call/wait "rm hsv.png"]
 		if exists? %tempo.png [call/wait "rm tempo.png"]
 		quit
@@ -1489,7 +1494,7 @@ openExcel: does [
 
 resultWin: layout [
 	title "Results"
-	button "Close Window" [unview/only resultWin]
+	pad 380x0 button "Close Window" [unview/only resultWin]
 	return
 	rcalcul: area 500x128 
 ]
@@ -1497,11 +1502,12 @@ resultWin: layout [
 captureWin: layout [
 	title "Capture"
 	button "Save Capture"	[
-			either isThermic [
+			either isThermic? [
 				fn: request-file/save/filter/file ["Thermal Images" "*.png"] thermCName]
 			[fn: request-file/save]
 			if not none? fn [save/as fn to-image canvas 'png] ;'only png	
 	]
+	pad 220x0
 	button "Close window" [unview/only captureWin]
 	return
 	canvas: base 450x500
@@ -1513,8 +1519,8 @@ confirmWin: layout [
 	text 180 "Quit Face Program?"
 	return
 	pad 40x0 
-	Button "Yes" [isQuit: true  unview/only confirmWin]
-	button "No" [isQuit: false unview/only confirmWin]	
+	Button "Yes" [isQuit?: true  unview/only confirmWin]
+	button "No" [isQuit?: false unview/only confirmWin]	
 ]
 
 mainWin: layout [
@@ -1524,21 +1530,21 @@ mainWin: layout [
 	style rHLine: base red 460x3 loose
 	style rVLine: base red 3x510 loose
 	button "Source Image"			[loadImage 0]
-	button "Processed Image"		[loadImage 1]
-	button "Save Modified Image "	[saveCorrectedImage]
+	button "Save Image "			[saveCorrectedImage]
 	button "Find landmarks"			[processCorrectedImage]
-	button "Save all points"		[saveMarks if isProcessed [getMarks2]]
-	button "Compute"				[if (isFile and isProcessed) [exportResults showResults readGlossary]]
-	button "Landmarks"					[view markWin] 										 
+	button "Save landmarks"			[saveMarks if isCorrectedImage? [getMarks2]]
+	button "Compute"				[if (isFile? and isCorrectedImage?) [exportResults showResults readGlossary]]
+	button "Processed Image"		[loadImage 1]
+	button "Landmarks Selection"	[view markWin] 										 
 	button "Quit" 		  			[quitRequested]
 	return
 	text "Color Space" 70
 	drop-down 100 data palette
 	select 1
 	on-change [
-		if isFile [
+		if isFile? [
 			colorSpace: face/selected
-			;unless isProcessed [
+			;unless isCorrectedImage? [
 				switch colorSpace [
 					1 [hsv: rcvCloneImage img0]
 					2 [rcv2BGRA img0 hsv]
@@ -1563,15 +1569,15 @@ mainWin: layout [
 	sb3: field 60
 	coordList: drop-list 125 data [] ; pb avec text-list 100x510 data [] event/picked
 	sb4: field 150
-	check "Numbering" false 	[isNumbered: face/data getMarks2]
+	check "Numbering" false 	[isNumbered?: face/data getMarks2]
 	check "Axes" true 			[hLine/visible?: vLine/visible?: face/data]	
-	cbPoints: check "Points" true
+	cbPoints: check "Landmarks" true
 	return
 	canvas1: base gsize2  white
 	drop-down 180 data measures
 	select 1
 	on-change [ 
-		if (isFile and isProcessed) [
+		if (isFile? and isCorrectedImage?) [
 			switch face/selected [
 					1	[getAllPoints]
 					3	[showVerticalAxisSup]
@@ -1592,10 +1598,10 @@ mainWin: layout [
 			sb1/text: form face/data/(face/selected)
 		]
 	]
-	button "All" [if (isFile and isProcessed) [getAllPoints]]
+	button "All" [if (isFile? and isCorrectedImage?) [getAllPoints]]
 	at 240x115 detail: text-list 260x220 
 	on-change [
-		if (isFile and isProcessed) [
+		if (isFile? and isCorrectedImage?) [
 			s: split face/data/(face/selected) separator
 			pointNum: to-integer s/1
 			pointCode: s/2
@@ -1615,7 +1621,7 @@ mainWin: layout [
 	at 240x340 calcul: area 260x255
 	at 10x340
 	sl: slider 222 [
-		if isFile [
+		if isFile? [
 			rot: to integer! face/data * 360 - 180
 			rotF/text: form rot
 			either rot = 0 [append rotF/text " degree"] [append rotF/text " degrees"] 
@@ -1624,7 +1630,7 @@ mainWin: layout [
 	]
 	at 10x370 
 	bm: button 50 "-" [
-		if isFile [
+		if isFile? [
 			rot: rot - 1
 			rotF/text: form rot
 			either rot = 0 [append rotF/text " degree"] [append rotF/text " degrees"] 
@@ -1634,7 +1640,7 @@ mainWin: layout [
 	]
 	at 60x372 rotF: field 120 center  "0 degrees" 
 	at 180x370 bp: button 50 "+" [
-		if isFile [
+		if isFile? [
 			rot: rot + 1 
 			rotF/text: form rot
 			either rot = 0 [append rotF/text " degree"] [append rotF/text " degrees"] 
@@ -1647,23 +1653,23 @@ mainWin: layout [
 	sb1: field 490 
 	
 	button "RGB Capture" [
-		if isFile [
+		if isFile? [
 			canvas/draw: none
 			canvas/image: draw img2 drawBlock
-			isThermic: false
+			isThermic?: false
 			view/flags captureWin ['modal 'no-buttons]
 		]
 	]
 	
 	button "Thermal Capture" [ 
-		if isfile [
+		if isFile? [
 			canvas/draw: none
 			canvas/image: draw img2 drawBlock
 			img: canvas/image
 			dst: rcvCloneImage img
 			rcvRGB2HSV img dst
 			canvas/image: dst
-			isThermic: true
+			isThermic?: true
 			view/flags captureWin ['modal 'no-buttons] 
 		]
 	]	
