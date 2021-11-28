@@ -1,17 +1,38 @@
 Red [
 	Title:   "Faces Processing"
 	Author:  "Francois Jouen"
-	File: 	 %face.red
+	File: 	 %face1_1.red
 	Needs:	 View
 ]
-;--Adapt to your configuration
+
+;--improved version for a better support for windows
+OS: to-string system/platform
+wTitle: rejoin ["CHArt/R2P2: Face [" OS "]"]
+
 home: select list-env "HOME"
-appDir: rejoin [home "/Programmation/Red/Face"]
-change-dir to-file appDir
+if any [OS = "MSDOS" OS = "Windows"][home: select list-env "USERPROFILE"]
+
+;--Adapt to your configuration for Gui application
+;appDir: to-file rejoin [home "/Programmation/Red/Face/"] ;--file! datatype
+;appDir: to-file rejoin [home "\Red\Face\"]        
+
+;--Console application (simple) 
+appDir: system/options/path		;--file! datatype
+
 landmarksFile: 	%config/landmarks.jpg
 glossFile: 		%config/glossaire.txt
 configFile: 	%config/config.txt 
 resultFile: 	%detectedPoints.txt
+
+;--Dlib python script: python3 required!
+prog: rejoin ["python " appDir "FacePoints.py "]
+
+if any [os = "MSDOS" os = "Windows"] [
+	glossFile:  %config/wglossaire.txt
+	configFile: %config/wconfig.txt
+	prog: rejoin ["python " appDir "wFacePoints.py "]
+]
+
 
 ;--required redCV libs
 #include %redCV/libs/core/rcvCore.red
@@ -20,8 +41,6 @@ resultFile: 	%detectedPoints.txt
 #include %redCV/libs/imgproc/rcvImgProc.red
 #include %redCV/libs/imgproc/rcvColorSpace.red
 
-;--Dlib python script: python3 required!
-prog: rejoin ["python3 " appDir "/FacePoints.py '"]
 
 margins: 10x10
 gsize:	450x500
@@ -399,7 +418,11 @@ loadImage: func [flag [integer!]] [
 		pointsFile: to-file rejoin [filePath imageName "P.txt"]
 		fileResult: to-file rejoin [filePath imageName "R.txt"]
 		thermCName: to-file rejoin [filePath imageName "Therm.png"]
-		prog: rejoin ["python3 " appDir "/FacePoints.py '" to-string imageCName "'" ]
+		
+		prog: rejoin ["python FacePoints.py '" to-string imageCName "'" ]
+		if any [os = "MSDOS" os = "Windows"] [
+			prog: rejoin ["python wFacePoints.py " to-local-file imageCName]
+		]
 		img0: load tmp
 		hsv: rcvCloneImage img0
 		
@@ -458,6 +481,8 @@ loadImage: func [flag [integer!]] [
 
 saveCorrectedImage: does [
 	either isFile? [
+		hLine/visible?: vLine/visible?: false
+		cbx/data: false
 		img: to-image canvas2
 		save/as imageCName img 'png ;'
 		sb1/text: copy "Image  "
@@ -471,13 +496,17 @@ saveCorrectedImage: does [
 processCorrectedImage: does [
 	if isFile? [
 		either isCorrectedImage [
-			sb1/text: "Patience! Landmarks identification" 
+			sb1/text: "Patience! Landmarks identification..." 
 			do-events/no-wait
 			isCorrectedImage?: false
 				if isSource? [
 					;--source image: calculate and save 73 landmarks
 					t1: now/time/precise
-					if count = 0 [call/wait prog getMarks] 
+					if count = 0 [
+							if to-file get-current-dir <> appDir [change-dir appDir]
+							ret: call/wait prog 
+							getMarks
+					] 
 					t2: now/time/precise
 					elapsed: round/to (third t2 - third t1) 0.01
 					isCorrectedImage?: true
@@ -1524,7 +1553,7 @@ confirmWin: layout [
 ]
 
 mainWin: layout [
-	title "CHArt/R2P2: Face"
+	title wTitle
 	origin margins space margins
 	style rect: base 255.255.255.240 28x28 loose draw [pen navy line-width 2 box 0x0 16x10]
 	style rHLine: base red 460x3 loose
@@ -1570,7 +1599,7 @@ mainWin: layout [
 	coordList: drop-list 125 data [] ; pb avec text-list 100x510 data [] event/picked
 	sb4: field 150
 	check "Numbering" false 	[isNumbered?: face/data getMarks2]
-	check "Axes" true 			[hLine/visible?: vLine/visible?: face/data]	
+	cbx: check "Axes" true 		[hLine/visible?: vLine/visible?: face/data]	
 	cbPoints: check "Landmarks" true
 	return
 	canvas1: base gsize2  white

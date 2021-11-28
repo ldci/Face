@@ -16,7 +16,7 @@ Very easy: just `red -c face.red`
 
 
 # Using Face
-You must **use command-line interface** since Face calls a python script. Change to application dir and just type `../face`.
+You must **use command-line interface** since Face calls a python script. Change to application dir and just type `./face`.
  
 Face processes 2-D images of faces for measuring facial heights, ratios and surfaces. You'll find in /publication  directory, our paper which gives all details about the used method.
 
