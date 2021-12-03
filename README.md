@@ -14,12 +14,12 @@ Face software also requires python 3: [python >= 3.8
 
 Face software requires [DLib c++ library](http://dlib.net) for facial landmarks recognition and  Python 3. 
 
-##macOS and Linux users
+## macOS and Linux users
 In most cases, required python libraries are still installed. 
 
 For installing dlib for Python just do `pip install dlib` or `pip3 install dlib` in your terminal.
 
-##Windows users
+## Windows users
 Installation can be a little bit complicated with Windows. 
 
 You need to install cMake. Have a look here [cmake install
