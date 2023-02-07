@@ -1,23 +1,25 @@
 Red [
 	Title:   "Faces Processing"
 	Author:  "Francois Jouen"
-	File: 	 %face1_1.red
+	File: 	 %face1_3.red
 	Needs:	 View
 ]
-
-;--improved version for a better support for windows
+print "Loading Face. Be Patient..."
+;--improved version for a better support for Windows
 OS: to-string system/platform
+if any [os = "macOS" os = "Linux" ] [home: select list-env "HOME"] 
+if any [OS = "MSDOS" OS = "Windows"][home: select list-env "USERPROFILE"]
 wTitle: rejoin ["CHArt/R2P2: Face [" OS "]"]
 
-home: select list-env "HOME"
-if any [OS = "MSDOS" OS = "Windows"][home: select list-env "USERPROFILE"]
 
 ;--Adapt to your configuration for Gui application
-;appDir: to-file rejoin [home "/Programmation/Red/Face/"] ;--file! datatype
-;appDir: to-file rejoin [home "\Red\Face\"]        
+appDir: to-red-file rejoin [home "/Programmation/Red/Face/"] ;--file! datatype
+;appDir: to-file rejoin [home "\Red\Face\"] 
+change-dir appDir       
 
-;--Console application (simple) 
-appDir: system/options/path		;--file! datatype
+;--Console application (simple, but terminal is required) 
+;appDir: system/options/path		;--file! datatype
+
 
 landmarksFile: 	%config/landmarks.jpg
 glossFile: 		%config/glossaire.txt
@@ -188,6 +190,7 @@ smallFont: make font! [
 
 ;--read landmarks glossary
 readGlossary: does [
+	print "Read landmarks glossary"
 	glossaire: read/lines glossFile
 	n: length? glossaire
 	detail/data: 	copy []
@@ -203,6 +206,7 @@ readGlossary: does [
 
 ;--read selected landmarks
 readConfig: does [
+	print "Read selected landmarks"
 	confLM: read/lines configFile
 	n: length? confLM
 	i: 2 ; first line: "Vertex" 
@@ -212,7 +216,7 @@ readConfig: does [
 		i: i + 1
 	]
 ]
-
+print "Generating Functions"
 ;--save selected landmarks
 saveConfig: does [
 	write configFile rejoin ["Vertex" newline]
@@ -419,10 +423,12 @@ loadImage: func [flag [integer!]] [
 		fileResult: to-file rejoin [filePath imageName "R.txt"]
 		thermCName: to-file rejoin [filePath imageName "Therm.png"]
 		
+		;--no space in filename!!!
 		prog: rejoin ["python FacePoints.py '" to-string imageCName "'" ]
 		if any [os = "MSDOS" os = "Windows"] [
 			prog: rejoin ["python wFacePoints.py " to-local-file imageCName]
 		]
+		
 		img0: load tmp
 		hsv: rcvCloneImage img0
 		
@@ -503,8 +509,8 @@ processCorrectedImage: does [
 					;--source image: calculate and save 73 landmarks
 					t1: now/time/precise
 					if count = 0 [
-							if to-file get-current-dir <> appDir [change-dir appDir]
-							ret: call/wait prog 
+							if get-current-dir <> appDir [change-dir appDir]
+							ret: call/wait/console prog 
 							getMarks
 					] 
 					t2: now/time/precise
@@ -1467,7 +1473,7 @@ showResults: does [
 ]
 
 ;-------------------- Windows ------------------------
-
+print "Generating Graphical Interface"
 markWin: layout [
 	title "LandMarks"
 	origin margins space margins
