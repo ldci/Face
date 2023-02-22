@@ -33,7 +33,7 @@ In Visual Studio go to the Individual Components tab, Visual C++ Tools for Cmake
 If all is correct, `pip install dlib` should be sufficient for installing python dlib version.
 
 # Face Compilation
-Modify in face.red, line 16 `appDir: to-red-file rejoin [home "/Programmation/Red/Face/"]` to dapt to your path
+Modify in face.red, line 16 `appDir: to-red-file rejoin [home "/Programmation/Red/Face/"]` to adapt to your path
 
 Compilation is very easy: just `cd` to the face-main directory and type `red -c face.red`. For Windows users, use *WindowsPowerShell* as terminal.
 In case of problems, type `red -u -c face.red` to upgrade runtime library.
