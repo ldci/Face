@@ -14,7 +14,6 @@ wTitle: rejoin ["CHArt/R2P2: Face [" OS "]"]
 
 ;--Adapt to your configuration for Gui application
 appDir: to-red-file rejoin [home "/Programmation/Red/Face/"] ;--file! datatype
-;appDir: to-file rejoin [home "\Red\Face\"] 
 change-dir appDir       
 
 ;--Console application (simple, but terminal is required) 
@@ -190,7 +189,7 @@ smallFont: make font! [
 
 ;--read landmarks glossary
 readGlossary: does [
-	print "Read landmarks glossary"
+	print "Reading landmarks glossary"
 	glossaire: read/lines glossFile
 	n: length? glossaire
 	detail/data: 	copy []
@@ -206,7 +205,7 @@ readGlossary: does [
 
 ;--read selected landmarks
 readConfig: does [
-	print "Read selected landmarks"
+	print "Reading selected landmarks"
 	confLM: read/lines configFile
 	n: length? confLM
 	i: 2 ; first line: "Vertex" 
